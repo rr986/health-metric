@@ -3,7 +3,8 @@ import { useRouter } from 'next/router';
 import { useAuth } from '../contexts/AuthContext';
 import {
   doSignInWithEmailAndPassword,
-  doSocialSignIn
+  doSocialSignIn,
+  doCreateUserWithEmailAndPassword
 } from '../utils/auth';
 
 export default function Login() {
@@ -12,6 +13,8 @@ export default function Login() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState(null);
 
   if (user) {
@@ -19,10 +22,14 @@ export default function Login() {
     return null;
   }
 
-  const handleEmailLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await doSignInWithEmailAndPassword(email, password);
+      if (isSignUp) {
+        await doCreateUserWithEmailAndPassword(email, password, displayName);
+      } else {
+        await doSignInWithEmailAndPassword(email, password);
+      }
       router.push('/dashboard');
     } catch (err) {
       setError(err.message);
@@ -40,8 +47,18 @@ export default function Login() {
 
   return (
     <div style={{ maxWidth: '400px', margin: '4rem auto', padding: '2rem', background: '#fff', borderRadius: '8px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
-      <h2>Sign In</h2>
-      <form onSubmit={handleEmailLogin}>
+      <h2>{isSignUp ? 'Create Account' : 'Sign In'}</h2>
+      <form onSubmit={handleSubmit}>
+        {isSignUp && (
+          <input
+            type="text"
+            placeholder="Display Name"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
+            required
+          />
+        )}
         <input
           type="email"
           placeholder="Email"
@@ -58,11 +75,27 @@ export default function Login() {
           onChange={e => setPassword(e.target.value)}
           style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
         />
-        <button type="submit" style={{ width: '100%' }}>Sign In</button>
+        <button type="submit" style={{ width: '100%' }}>
+          {isSignUp ? 'Sign Up' : 'Sign In'}
+        </button>
       </form>
+
+      <p style={{ textAlign: 'center', marginTop: '1rem' }}>
+        {isSignUp ? 'Already have an account?' : 'New here?'}{' '}
+        <button
+          onClick={() => setIsSignUp(!isSignUp)}
+          style={{ background: 'none', color: '#0070f3', border: 'none', cursor: 'pointer', padding: 0 }}
+        >
+          {isSignUp ? 'Sign In' : 'Create one'}
+        </button>
+      </p>
+
       <hr style={{ margin: '2rem 0' }} />
-      <button onClick={handleGoogleLogin} style={{ width: '100%', background: '#db4437' }}>Sign in with Google</button>
+      <button onClick={handleGoogleLogin} style={{ width: '100%', background: '#db4437', color: '#fff', padding: '0.5rem' }}>
+        Sign in with Google
+      </button>
       {error && <p style={{ color: 'red', marginTop: '1rem' }}>{error}</p>}
     </div>
   );
 }
+

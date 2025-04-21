@@ -32,14 +32,19 @@ async function loadHeartDataset() {
 }
 
 exports.healthCoachSuggestions = functions.https.onCall(async (data, context) => {
-  if (!context.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'User must be signed in.');
+  console.log('[healthCoachSuggestions] Raw Data:', data);
+
+  const { uid } = data.data || {};
+  console.log('[healthCoachSuggestions] UID:', uid);
+
+  if (!uid) {
+    throw new functions.https.HttpsError('invalid-argument', 'Missing UID.');
   }
 
-  const uid = context.auth.uid;
-
-  const snapshot = await db.collection('secureHealthEntries')
-    .where('userId', '==', uid)
+  const snapshot = await db
+    .collection('users')
+    .doc(uid)
+    .collection('secureHealthEntries')
     .orderBy('createdAt', 'desc')
     .limit(1)
     .get();
@@ -57,7 +62,6 @@ exports.healthCoachSuggestions = functions.https.onCall(async (data, context) =>
   const input = preprocess(vitals);
   const baselineRisk = predictNaiveBayes(model, labelCounts, input);
 
-  // Try improving each metric one-by-one
   const suggestions = [];
   const testVariants = [
     {

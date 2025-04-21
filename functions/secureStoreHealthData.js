@@ -5,24 +5,26 @@ const { encrypt } = require('./utils/encryption');
 const db = admin.firestore();
 
 exports.secureStoreHealthData = functions.https.onCall(async (data, context) => {
-  if (!context.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'User must be signed in.');
-  }
+  const { uid, trestbps, chol, thalach, glucose } = data.data;
 
-  const { trestbps, chol, thalach, glucose } = data;
+  console.log('[secureStoreHealthData] UID:', uid);
+  console.log('[secureStoreHealthData] Data:', { trestbps, chol, thalach, glucose });
 
-  if (!trestbps || !chol || !thalach) {
-    throw new functions.https.HttpsError('invalid-argument', 'Missing required vital signs.');
+  if (!uid || !trestbps || !chol || !thalach) {
+    throw new functions.https.HttpsError('invalid-argument', 'Missing required vital signs or UID.');
   }
 
   const { encrypted, iv } = encrypt({ trestbps, chol, thalach, glucose });
 
-  await db.collection('secureHealthEntries').add({
-    userId: context.auth.uid,
-    encrypted,
-    iv,
-    createdAt: admin.firestore.FieldValue.serverTimestamp()
-  });
+  await db
+    .collection('users')
+    .doc(uid)
+    .collection('secureHealthEntries')
+    .add({
+      encrypted,
+      iv,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
 
   return { success: true };
 });

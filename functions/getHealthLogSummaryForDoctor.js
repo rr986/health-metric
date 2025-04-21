@@ -5,35 +5,52 @@ const { decrypt } = require('./utils/encryption');
 const db = admin.firestore();
 
 exports.getHealthLogSummaryForDoctor = functions.https.onCall(async (data, context) => {
-  if (!context.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'User must be signed in.');
-  }
+  try {
+    console.log('[DoctorSummary] Raw Data:', data);
 
-  const { patientId } = data;
+    const { patientId } = data.data || {};
 
-  if (!patientId) {
-    throw new functions.https.HttpsError('invalid-argument', 'Missing patient ID.');
-  }
+    console.log('[DoctorSummary] patientId:', patientId);
 
-  const snapshot = await db.collection('secureHealthEntries')
-    .where('userId', '==', patientId)
-    .orderBy('createdAt', 'desc')
-    .limit(10)
-    .get();
+    if (!patientId) {
+      throw new functions.https.HttpsError('invalid-argument', 'Missing patient ID.');
+    }
 
-  const logs = [];
+    const ref = db.collection('users')
+      .doc(patientId)
+      .collection('secureHealthEntries')
+      .orderBy('createdAt', 'desc')
+      .limit(10);
 
-  snapshot.forEach(doc => {
-    const entry = doc.data();
-    const decrypted = JSON.parse(decrypt(entry.encrypted, entry.iv));
-    logs.push({
-      ...decrypted,
-      createdAt: entry.createdAt?.toDate() || null
+    console.log('[DoctorSummary] Querying Firestore:', ref.path);
+
+    const snapshot = await ref.get();
+
+    if (snapshot.empty) {
+      throw new functions.https.HttpsError('not-found', 'No health data found.');
+    }
+
+    const logs = [];
+
+    snapshot.forEach(doc => {
+      const entry = doc.data();
+      console.log('[DoctorSummary] Decrypting entry:', entry);
+      const decrypted = JSON.parse(decrypt(entry.encrypted, entry.iv));
+      logs.push({
+        ...decrypted,
+        createdAt: entry.createdAt?.toDate().toISOString() || null
+      });
     });
-  });
 
-  return {
-    logs,
-    summary: `${logs.length} entries returned.`,
-  };
+    console.log('[DoctorSummary] Logs prepared:', logs);
+
+    return {
+      logs,
+      summary: `${logs.length} entries returned.`,
+    };
+  } catch (err) {
+    console.error('[DoctorSummary ERROR]', err);
+    throw new functions.https.HttpsError('internal', err.message || 'Unknown error occurred.');
+  }
 });
+

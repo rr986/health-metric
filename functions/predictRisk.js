@@ -23,7 +23,7 @@ async function loadHeartDataset() {
             chol: parseFloat(row.chol),
             thalach: parseFloat(row.thalach),
           }),
-          label: row.target
+          label: row.target,
         });
       })
       .on('end', () => resolve(dataset))
@@ -32,15 +32,19 @@ async function loadHeartDataset() {
 }
 
 exports.predictRisk = functions.https.onCall(async (data, context) => {
-  if (!context.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'User must be signed in.');
+  console.log('[predictRisk] Raw Data:', data);
+
+  const { uid } = data.data || {};
+  console.log('[predictRisk] UID:', uid);
+
+  if (!uid) {
+    throw new functions.https.HttpsError('invalid-argument', 'Missing UID.');
   }
 
-  const uid = context.auth.uid;
-
-  //Get encrypted vitals from Firestore
-  const snapshot = await db.collection('secureHealthEntries')
-    .where('userId', '==', uid)
+  const snapshot = await db
+    .collection('users')
+    .doc(uid)
+    .collection('secureHealthEntries')
     .orderBy('createdAt', 'desc')
     .limit(1)
     .get();
@@ -55,14 +59,12 @@ exports.predictRisk = functions.https.onCall(async (data, context) => {
   const input = preprocess({
     trestbps: decryptedData.trestbps,
     chol: decryptedData.chol,
-    thalach: decryptedData.thalach
+    thalach: decryptedData.thalach,
   });
 
-  //Load dataset and train model
   const dataset = await loadHeartDataset();
   const { model, labelCounts } = trainNaiveBayes(dataset);
 
-  //Predict risk
   const result = predictNaiveBayes(model, labelCounts, input);
 
   return { risk: result };

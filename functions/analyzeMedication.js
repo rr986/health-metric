@@ -17,18 +17,19 @@ const warningInteractions = {
 };
 
 exports.analyzeMedication = functions.https.onCall(async (data, context) => {
-  if (!context.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'User must be signed in.');
+  const { prescriptions, uid } = data.data || {};
+
+  console.log('[analyzeMedication] UID:', uid);
+  console.log('[analyzeMedication] Prescriptions:', prescriptions);
+
+  if (!uid || !Array.isArray(prescriptions)) {
+    throw new functions.https.HttpsError('invalid-argument', 'Missing UID or prescriptions must be an array.');
   }
 
-  const { prescriptions } = data;
-  if (!Array.isArray(prescriptions)) {
-    throw new functions.https.HttpsError('invalid-argument', 'Prescriptions must be an array.');
-  }
-
-  // Get latest entry
-  const snapshot = await db.collection('secureHealthEntries')
-    .where('userId', '==', context.auth.uid)
+  const snapshot = await db
+    .collection('users')
+    .doc(uid)
+    .collection('secureHealthEntries')
     .orderBy('createdAt', 'desc')
     .limit(1)
     .get();
