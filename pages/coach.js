@@ -30,13 +30,31 @@ export default function Coach() {
   }
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h2>Health Coach Suggestions</h2>
+    <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
+      <h2>Personalized Health Coach</h2>
+
       {error && <p style={{ color: 'red' }}>{error}</p>}
+
       {suggestions ? (
-        <pre>{JSON.stringify(suggestions, null, 2)}</pre>
+        <div style={{ background: '#f9f9f9', padding: '1rem', borderRadius: '8px' }}>
+          <p><strong>Current Risk Level:</strong> {suggestions.baselineRisk}</p>
+          <p><strong>Coach Message:</strong> {suggestions.message}</p>
+
+          {suggestions.suggestions && suggestions.suggestions.length > 0 && (
+            <div style={{ marginTop: '1rem' }}>
+              <strong>Recommendations:</strong>
+              <ul>
+                {suggestions.suggestions.map((s, index) => (
+                  <li key={index}>
+                    <strong>{s.recommendation}</strong> – {s.estimatedImpact}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       ) : (
-        <p>Loading...</p>
+        <p>Loading coach insights...</p>
       )}
     </div>
   );
