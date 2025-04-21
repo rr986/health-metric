@@ -5,24 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a7cf25a6-e552-460c-96e2-d505ece482d2" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/components/Navbar.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/contexts/AuthContext.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/functions/analyzeMedication.js" beforeDir="false" afterPath="$PROJECT_DIR$/functions/analyzeMedication.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/functions/getHealthLogSummaryForDoctor.js" beforeDir="false" afterPath="$PROJECT_DIR$/functions/getHealthLogSummaryForDoctor.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/functions/healthCoach.js" beforeDir="false" afterPath="$PROJECT_DIR$/functions/healthCoach.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/functions/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/functions/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/functions/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/functions/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/functions/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/functions/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/functions/predictRisk.js" beforeDir="false" afterPath="$PROJECT_DIR$/functions/predictRisk.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/functions/secureStoreHealthData.js" beforeDir="false" afterPath="$PROJECT_DIR$/functions/secureStoreHealthData.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/_app.js" beforeDir="false" afterPath="$PROJECT_DIR$/pages/_app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/coach.js" beforeDir="false" afterPath="$PROJECT_DIR$/pages/coach.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/dashboard.js" beforeDir="false" afterPath="$PROJECT_DIR$/pages/dashboard.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/login.js" beforeDir="false" afterPath="$PROJECT_DIR$/pages/login.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/prescriptions.js" beforeDir="false" afterPath="$PROJECT_DIR$/pages/prescriptions.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/summary.js" beforeDir="false" afterPath="$PROJECT_DIR$/pages/summary.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/firebase.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/firebase.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

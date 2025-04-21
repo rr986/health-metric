@@ -14,8 +14,4 @@ exports.analyzeMedication = analyzeMedication;
 exports.healthCoachSuggestions = healthCoachSuggestions;
 exports.getHealthLogSummaryForDoctor = getHealthLogSummaryForDoctor;
 
-exports.helloWorld = functions.https.onCall((data, context) => {
-  console.log('[helloWorld] context.auth:', context.auth);
-  return { message: `Hello ${context.auth?.uid || 'Guest'}` };
-});
 
