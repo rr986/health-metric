@@ -61,13 +61,9 @@ const Dashboard = () => {
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h1>Welcome to Your Dashboard</h1>
+      <h1>Health Risk Dashboard</h1>
 
-      {user && (
-        <p>
-          <strong>Status:</strong> Signed in as {user.email}
-        </p>
-      )}
+      {user && <p><strong>Signed in as:</strong> {user.email}</p>}
 
       {user && (
         <button onClick={handleSignOut} style={{ marginBottom: '1rem' }}>
@@ -76,27 +72,25 @@ const Dashboard = () => {
       )}
 
       <button onClick={handleStoreVitals} style={{ marginTop: '1rem' }}>
-        Store Example Health Data
+        Store Sample Health Data
       </button>
 
       <div style={{ marginTop: '1rem' }}>
-        <label>
-          <strong>Select ML Algorithm:</strong>
-        </label>
+        <label><strong>Select ML Algorithm:</strong></label>
         <select
           value={method}
           onChange={(e) => setMethod(e.target.value)}
           style={{ marginLeft: '0.5rem', padding: '0.3rem' }}
         >
           <option value="naiveBayes">Naive Bayes</option>
-          <option value="decisionTree">Decision Tree</option>
-          <option value="knn">K-Nearest Neighbors</option>
           <option value="logisticRegression">Logistic Regression</option>
+          <option value="mlp">MLP (Neural Network)</option>
+          <option value="randomForest">Random Forest</option>
         </select>
       </div>
 
       <button onClick={handleRiskPrediction} style={{ marginTop: '1rem' }}>
-        Predict Health Risk
+        Predict Risk
       </button>
 
       {error && (
@@ -123,6 +117,7 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
 
 /* last import React, { useEffect, useState } from 'react';
 import { auth, functions } from '../utils/firebase';

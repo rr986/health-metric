@@ -1,9 +1,9 @@
 const functions = require('firebase-functions');
 const { preprocess } = require('./utils/preprocessing');
 const { trainNaiveBayes, predictNaiveBayes } = require('./utils/naiveBayes');
-const { trainDecisionTree, predictDecisionTree } = require('./utils/decisionTree');
-const { trainKNN, predictKNN } = require('./utils/knn');
 const { trainLogisticRegression, predictLogisticRegression } = require('./utils/logisticRegression');
+const { trainMLP, predictMLP } = require('./utils/mlp');
+const { trainRandomForest, predictRandomForest } = require('./utils/randomForest');
 const { decrypt } = require('./utils/encryption');
 const admin = require('firebase-admin');
 const csv = require('csv-parser');
@@ -35,11 +35,7 @@ async function loadHeartDataset() {
 }
 
 exports.predictRisk = functions.https.onCall(async (data, context) => {
-  console.log('[predictRisk] Raw Data:', data);
-
   const { uid, method = 'naiveBayes' } = data.data || {};
-  console.log(`[predictRisk] UID: ${uid}, Method: ${method}`);
-
   if (!uid) {
     throw new functions.https.HttpsError('invalid-argument', 'Missing UID.');
   }
@@ -66,27 +62,27 @@ exports.predictRisk = functions.https.onCall(async (data, context) => {
   });
 
   const dataset = await loadHeartDataset();
-
   let risk;
+
   switch (method) {
     case 'naiveBayes':
       const { model: nbModel, labelCounts } = trainNaiveBayes(dataset);
       risk = predictNaiveBayes(nbModel, labelCounts, input);
       break;
 
-    case 'decisionTree':
-      const tree = trainDecisionTree(dataset);
-      risk = predictDecisionTree(tree, input);
-      break;
-
-    case 'knn':
-      const knnModel = trainKNN(dataset, 3);
-      risk = predictKNN(knnModel, input);
-      break;
-
     case 'logisticRegression':
-      const lrModel = trainLogisticRegression(dataset, 1000, 0.1);
+      const lrModel = trainLogisticRegression(dataset);
       risk = predictLogisticRegression(lrModel, input);
+      break;
+
+    case 'mlp':
+      const mlpModel = trainMLP(dataset);
+      risk = predictMLP(mlpModel, input);
+      break;
+
+    case 'randomForest':
+      const forestModel = trainRandomForest(dataset);
+      risk = predictRandomForest(forestModel, input);
       break;
 
     default:
